@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { CalendarDateRangePicker } from '@/components/ui/date-range-picker'
 import { Button } from '@/components/ui/button'
