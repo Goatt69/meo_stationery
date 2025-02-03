@@ -14,119 +14,150 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-// This would typically come from a database or API
-const categories = ['Books', 'Writing Instruments', 'Paper Products', 'Art Supplies']
+type Props = {
+  params: {
+    action: string;
+    id?: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
 
-export default function ProductForm({ params }: { params: { action: string } }) {
+export default function ProductForm({ params, searchParams }: Props) {
   const router = useRouter()
   const isEditing = params.action === 'edit'
+  const [categories, setCategories] = useState<Category[]>([])
 
   const [formData, setFormData] = useState({
     name: '',
     price: '',
     stock: '',
-    category: '',
+    categoryId: '',
     description: '',
   })
 
   useEffect(() => {
-    if (isEditing) {
-      // Fetch product data if editing
-      // This is a placeholder. In a real app, you'd fetch the data from an API
-      setFormData({
-        name: 'Sample Product',
-        price: '9.99',
-        stock: '100',
-        category: 'Books',
-        description: 'This is a sample product description.',
-      })
+    // Fetch categories
+    const fetchCategories = async () => {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      setCategories(data)
     }
-  }, [isEditing])
+
+    fetchCategories()
+
+    if (isEditing) {
+      const fetchProduct = async () => {
+        const response = await fetch(`/api/products/${params.id}`)
+        const data = await response.json()
+        setFormData({
+          name: data.name,
+          price: data.price.toString(),
+          stock: data.quantity.toString(),
+          categoryId: data.categoryId?.toString() || '',
+          description: data.status || '',
+        })
+      }
+      fetchProduct()
+    }
+  }, [isEditing, params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSelectChange = (value: string) => {
-    setFormData({ ...formData, category: value })
+    setFormData({ ...formData, categoryId: value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission (e.g., send to API, add to database)
-    console.log('Form submitted:', formData)
-    router.push('/admin')
+
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+
+    if (response.ok) {
+      router.push('/admin')
+    }
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-5">
-        {isEditing ? 'Edit Product' : 'Add New Product'}
-      </h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-        <div>
-          <Label htmlFor="name">Product Name</Label>
-          <Input
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="price">Price</Label>
-          <Input
-            id="price"
-            name="price"
-            type="number"
-            step="0.01"
-            value={formData.price}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="stock">Stock</Label>
-          <Input
-            id="stock"
-            name="stock"
-            type="number"
-            value={formData.stock}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="category">Category</Label>
-          <Select name="category" value={formData.category} onValueChange={handleSelectChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <Button type="submit">
-          {isEditing ? 'Update Product' : 'Add Product'}
-        </Button>
-      </form>
-    </div>
+      <div className="container mx-auto py-10">
+        <h1 className="text-3xl font-bold mb-5">
+          {isEditing ? 'Edit Product' : 'Add New Product'}
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+          <div>
+            <Label htmlFor="name">Product Name</Label>
+            <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+            />
+          </div>
+          <div>
+            <Label htmlFor="price">Price</Label>
+            <Input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                value={formData.price}
+                onChange={handleChange}
+                required
+            />
+          </div>
+          <div>
+            <Label htmlFor="stock">Stock</Label>
+            <Input
+                id="stock"
+                name="stock"
+                type="number"
+                value={formData.stock}
+                onChange={handleChange}
+                required
+            />
+          </div>
+          <div>
+            <Label htmlFor="categoryId">Category</Label>
+            <Select name="categoryId" value={formData.categoryId} onValueChange={handleSelectChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.catName}
+                    </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+            />
+          </div>
+          <Button type="submit">
+            {isEditing ? 'Update Product' : 'Add Product'}
+          </Button>
+        </form>
+      </div>
   )
 }
 
+interface Category {
+  id: number
+  catName: string
+}
