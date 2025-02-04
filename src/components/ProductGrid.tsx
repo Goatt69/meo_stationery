@@ -19,9 +19,31 @@ function SkeletonCard() {
   )
 }
 
-export default function ProductGrid({ categories }) {
-  const { addItem } = useCart()
 
+import { StockStatus } from '@prisma/client'
+
+interface Category {
+  id: number
+  catName: string
+  products: {
+    id: number
+    name: string
+    price: number
+    stock: StockStatus
+    quantity: number
+    status?: string | null
+    createdAt?: string
+    categoryId?: number | null
+  }[]
+  children: {
+    id: number
+    catName: string
+    parentId: number | null
+  }[]
+}
+
+export default function ProductGrid({ categories }: { categories: Category[] }) {
+  const { addItem } = useCart()
   return (
     <>
       {categories.map((category) => (
