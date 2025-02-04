@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         vnp_TxnRef: orderId,
         vnp_OrderInfo: orderInfo,
         vnp_OrderType: ProductCode.Other,
-        vnp_ReturnUrl: 'http://localhost:3000/checkout/payment/vnpay',
+        vnp_ReturnUrl: 'http://localhost:3000/checkout/payment/vnpay' || 'https://meostationary.netlify.app/checkout/payment/vnpay',
         vnp_Locale: VnpLocale.VN,
         vnp_CreateDate: dateFormat(new Date()),
         vnp_ExpireDate: dateFormat(new Date(Date.now() + 24 * 60 * 60 * 1000)),
