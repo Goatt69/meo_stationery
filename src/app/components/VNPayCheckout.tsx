@@ -13,13 +13,17 @@ const VNPayCheckout = () => {
       const orderInfo = 'Payment for order';
 
       try {
-        const response = await fetch('/api/vnpay/generate-payment-url', {
+        const response = await fetch('/api/vnpay/generate-payment-url', { // nigga
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ orderId, amount, orderInfo }),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate payment URL');
+        }
 
         const data = await response.json();
         if (data.paymentUrl) {
