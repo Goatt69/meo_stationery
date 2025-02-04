@@ -30,8 +30,10 @@ export default function ShippingPage() {
     if (paymentMethod === "cod") {
       // For COD, we can skip the payment page
       router.push("/checkout/confirmation")
+    } else if (paymentMethod === "VNPAY") {
+      router.push("/checkout/payment/vnpay") // Redirect to VNPay payment
     } else {
-      router.push("/checkout/payment")
+      router.push("/checkout/payment") // Redirect to other payment methods
     }
   }
 
@@ -69,6 +71,10 @@ export default function ShippingPage() {
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="momo" id="momo" />
               <Label htmlFor="momo">MoMo</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="VNPAY" id="VNPAY" />
+              <Label htmlFor="VNPAY">VNPAY</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="cod" id="cod" />

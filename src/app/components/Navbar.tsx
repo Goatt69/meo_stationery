@@ -24,7 +24,7 @@ type Category = {
 }
 
 export default function Navbar() {
-  const [cartItems, setCartItems] = useState(0)
+  const [cartItems] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
