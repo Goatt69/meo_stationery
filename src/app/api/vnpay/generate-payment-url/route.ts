@@ -1,4 +1,3 @@
-// app/api/vnpay/generate-payment-url/route.ts
 import { NextResponse } from 'next/server';
 import { VNPay, ProductCode, VnpLocale, dateFormat } from 'vnpay';
 
@@ -14,10 +13,6 @@ export async function POST(request: Request) {
     const clientIp = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
     console.log("Received payment request:", { orderId, amount, orderInfo });
-
-    // Log environment variables for debugging
-    console.log("VNP_TMN_CODE:", process.env.VNP_TMN_CODE);
-    console.log("VNP_HASH_SECRET:", process.env.VNP_HASH_SECRET);
 
     const paymentUrl = vnp.buildPaymentUrl({
       vnp_Amount: amount * 100, // Convert to VNPay format

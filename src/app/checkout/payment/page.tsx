@@ -19,18 +19,18 @@ const PaymentPage = () => {
     const orderId = `ORDER_${Date.now()}`;
     const amount = 1000000;
     const orderInfo = 'Payment for order';
-
+  
     try {
       const response = await fetch('/api/vnpay/generate-payment-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, amount, orderInfo }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const data = await response.json();
       if (data.paymentUrl) {
         console.log('Redirecting to payment URL:', data.paymentUrl);
