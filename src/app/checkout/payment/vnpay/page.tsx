@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function VNPayReturnPage() {
+const VNPayReturnPageContent = () => {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("Processing payment...");
 
@@ -24,5 +24,13 @@ export default function VNPayReturnPage() {
     <div className="container mx-auto py-10 text-center">
       <h1 className="text-3xl font-bold">{status}</h1>
     </div>
+  );
+};
+
+export default function VNPayReturnPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VNPayReturnPageContent />
+    </Suspense>
   );
 }

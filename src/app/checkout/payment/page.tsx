@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckoutCard } from '@/components/CheckoutCard';
 import VNPayCheckout from '@/app/components/VNPayCheckout';
 
-export default function PaymentPage() {
+function PaymentContent() {
   const searchParams = useSearchParams();
   const paymentMethod = searchParams.get('method') || 'visa';
 
@@ -21,5 +22,13 @@ export default function PaymentPage() {
         <CheckoutCard />
       )}
     </div>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentContent />
+    </Suspense>
   );
 }
