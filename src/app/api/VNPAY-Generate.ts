@@ -1,31 +1,27 @@
 // pages/api/vnpay/generate-payment-url.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { VNPay } from 'vnpay';
+import { VNPay, ProductCode, VnpLocale } from 'vnpay';
 
 const vnp = new VNPay({
   tmnCode: process.env.VNP_TMN_CODE as string,
-  hashSecret: process.env.VNP_HASH_SECRET as string,
-  returnUrl: process.env.VNP_RETURN_URL as string,
+  secureSecret: process.env.VNP_HASH_SECRET as string,
+  vnpayHost: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
 });
-
-interface RequestBody {
-  orderId: string;
-  amount: number;
-  orderInfo: string;
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { orderId, amount, orderInfo }: RequestBody = req.body;
+    const { orderId, amount, orderInfo } = req.body;
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
       const paymentUrl = vnp.buildPaymentUrl({
-        amount,
-        bankCode: 'NCB', // Optional: specify bank code
-        orderId,
-        orderInfo,
-        orderType: 'billpayment',
-        locale: 'vn',
+        vnp_Amount: amount, // Amount in VND
+        vnp_IpAddr: clientIp as string,
+        vnp_TxnRef: orderId,
+        vnp_OrderInfo: orderInfo,
+        vnp_OrderType: ProductCode.Other,
+        vnp_ReturnUrl: 'http://localhost:3000/vnpay-return',
+        vnp_Locale: VnpLocale.VN, // 'vn' or 'en'
       });
 
       res.status(200).json({ paymentUrl });

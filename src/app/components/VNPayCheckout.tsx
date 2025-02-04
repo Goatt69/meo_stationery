@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,9 +7,9 @@ const VNPayCheckout = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const generatePaymentUrl = async () => {
+    const initiatePayment = async () => {
       const orderId = `ORDER_${Date.now()}`;
-      const amount = 1000000; // Example amount in VND
+      const amount = 1000000; // Amount in VND
       const orderInfo = 'Payment for order';
 
       try {
@@ -24,16 +24,18 @@ const VNPayCheckout = () => {
         const data = await response.json();
         if (data.paymentUrl) {
           router.push(data.paymentUrl);
+        } else {
+          console.error('Payment URL not received');
         }
       } catch (error) {
-        console.error('Error generating payment URL:', error);
+        console.error('Error initiating payment:', error);
       }
     };
 
-    generatePaymentUrl();
+    initiatePayment();
   }, [router]);
 
-  return <div>Redirecting to VNPAY...</div>;
+  return <div>Redirecting to VNPay...</div>;
 };
 
 export default VNPayCheckout;
