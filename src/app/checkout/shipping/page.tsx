@@ -31,10 +31,9 @@ export default function ShippingPage() {
       // For COD, we can skip the payment page
       router.push("/checkout/confirmation")
     } else if (paymentMethod === "VNPAY") {
-      router.push ("/checkout/payment/vnpay") // very funny code that redirect u to vnpay payment 
-    }
-    else {
-      router.push("/checkout/payment")
+      router.push("/checkout/payment/vnpay") // Redirect to VNPay payment
+    } else {
+      router.push("/checkout/payment") // Redirect to other payment methods
     }
   }
 

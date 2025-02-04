@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 const VNPayCheckout = () => {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handlePayment = async () => {
@@ -20,9 +18,14 @@ const VNPayCheckout = () => {
         body: JSON.stringify({ orderId, amount, orderInfo }),
       });
 
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
       const data = await response.json();
       if (data.paymentUrl) {
-        router.push(data.paymentUrl);
+        console.log('Redirecting to payment URL:', data.paymentUrl);
+        window.location.href = data.paymentUrl;
       } else {
         console.error('Payment URL not received');
       }

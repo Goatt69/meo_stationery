@@ -1,19 +1,22 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function VNPayReturnPage() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState('Processing payment...');
+  const [status, setStatus] = useState("Processing payment...");
 
   useEffect(() => {
-    const responseCode = searchParams.get('vnp_ResponseCode');
+    console.log("Raw search params:", searchParams.toString());
 
-    if (responseCode === '00') {
-      setStatus('Payment successful! Thank you.');
+    const responseCode = searchParams.get("vnp_ResponseCode");
+    console.log("VNPay Response Code:", responseCode); // Debugging log
+
+    if (responseCode === "00") {
+      setStatus("Payment successful! Thank you.");
     } else {
-      setStatus('Payment failed. Please try again.');
+      setStatus("Payment failed. Please try again.");
     }
   }, [searchParams]);
 
