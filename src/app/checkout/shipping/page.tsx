@@ -23,19 +23,20 @@ export default function ShippingPage() {
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically save the shipping info and payment method
-    console.log("Shipping info:", formData)
-    console.log("Payment method:", paymentMethod)
+    e.preventDefault();
+    console.log("Shipping info:", formData);
+    console.log("Payment method:", paymentMethod);
+  
     if (paymentMethod === "cod") {
-      // For COD, we can skip the payment page
-      router.push("/checkout/confirmation")
+      // For COD, skip the payment page
+      router.push("/checkout/confirmation");
     } else if (paymentMethod === "VNPAY") {
-      router.push("/checkout/payment/vnpay") // Redirect to VNPay payment
+      // Redirect to the payment page with the method as a query parameter
+      router.push("/checkout/payment?method=VNPAY");
     } else {
-      router.push("/checkout/payment") // Redirect to other payment methods
+      router.push("/checkout/payment?method=visa"); // Redirect for other payment methods
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10">
