@@ -1,45 +1,49 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const VNPayCheckout = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const initiatePayment = async () => {
-      const orderId = `ORDER_${Date.now()}`;
-      const amount = 1000000; // Amount in VND
-      const orderInfo = 'Payment for order';
+  const handlePayment = async () => {
+    setLoading(true);
+    const orderId = `ORDER_${Date.now()}`;
+    const amount = 1000000;
+    const orderInfo = 'Payment for order';
 
-      try {
-        const response = await fetch('/api/vnpay/generate-payment-url', { // nigga
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ orderId, amount, orderInfo }),
-        });
+    try {
+      const response = await fetch('/api/vnpay/generate-payment-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, amount, orderInfo }),
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to generate payment URL');
-        }
-
-        const data = await response.json();
-        if (data.paymentUrl) {
-          router.push(data.paymentUrl);
-        } else {
-          console.error('Payment URL not received');
-        }
-      } catch (error) {
-        console.error('Error initiating payment:', error);
+      const data = await response.json();
+      if (data.paymentUrl) {
+        router.push(data.paymentUrl);
+      } else {
+        console.error('Payment URL not received');
       }
-    };
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    initiatePayment();
-  }, [router]);
-
-  return <div>Redirecting to VNPay...</div>;
+  return (
+    <div className="text-center">
+      <button
+        onClick={handlePayment}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        disabled={loading}
+      >
+        {loading ? 'Processing...' : 'Pay with VNPay'}
+      </button>
+    </div>
+  );
 };
 
 export default VNPayCheckout;

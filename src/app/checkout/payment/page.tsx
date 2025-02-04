@@ -1,12 +1,10 @@
-// app/payment/page.tsx
-"use client"
+"use client";
 
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { CheckoutCard } from "@/components/CheckoutCard"
+import { useSearchParams } from 'next/navigation';
+import { CheckoutCard } from '@/components/CheckoutCard';
 import VNPayCheckout from '@/app/components/VNPayCheckout';
 
-function PaymentContent() {
+export default function PaymentPage() {
   const searchParams = useSearchParams();
   const paymentMethod = searchParams.get('method') || 'visa';
 
@@ -18,21 +16,10 @@ function PaymentContent() {
       ) : paymentMethod === 'momo' ? (
         <div>
           <p>Please complete your payment using MoMo.</p>
-          {/* Add MoMo payment integration here */}
         </div>
       ) : (
         <CheckoutCard />
       )}
     </div>
   );
-}
-
-export default function PaymentPage() {
-  return (
-      <div className="container mx-auto py-10">
-        <Suspense fallback={<div>Loading...</div>}>
-          <PaymentContent />
-        </Suspense>
-      </div>
-  )
 }
