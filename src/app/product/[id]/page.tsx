@@ -3,16 +3,20 @@ import { Button } from '@/components/ui/button'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { prisma } from '@/lib/prisma'
 import {formatToVND} from "@/lib/utils";
+import {use} from "react";
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  const product = await prisma.product.findUnique({
+type Params = Promise<{ id: string }>
+
+const ProductPage = (props: { params: Params }) => {
+  const params = use(props.params)
+  const product = use(prisma.product.findUnique({
     where: {
       id: parseInt(params.id)
     },
     include: {
       category: true
     }
-  })
+  }))
 
   if (!product) {
     notFound()
@@ -79,3 +83,5 @@ export default async function ProductPage({ params }: { params: { id: string } }
       </>
   )
 }
+
+export default ProductPage

@@ -69,10 +69,10 @@ export default function ProductsPage() {
     product.sku.toLowerCase().includes(search.toLowerCase())
   )
 
-  const getStockStatus = (stock: number) => {
-    if (stock <= 5) return 'destructive'
-    if (stock <= 20) return 'warning'
-    return 'default'
+  const getStockStatus = (stock: number): "destructive" | "default" | "outline" | "secondary" => {
+    if (stock <= 5) return "destructive"
+    if (stock <= 20) return "secondary"
+    return "default"
   }
 
   return (

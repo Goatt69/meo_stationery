@@ -2,3 +2,4 @@
 /node_modules/
 /.idea/
 /prisma/
+/src/components/ui/
