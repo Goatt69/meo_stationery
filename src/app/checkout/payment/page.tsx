@@ -22,7 +22,7 @@ const PaymentPage = () => {
   const handleVNPayPayment = async () => {
     setLoading(true);
     const orderId = `ORDER_${Date.now()}`;
-    const amount = 1000000;
+    const amount = 10000;
     const orderInfo = "Payment for order";
 
     try {
