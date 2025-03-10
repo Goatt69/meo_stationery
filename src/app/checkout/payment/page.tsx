@@ -25,8 +25,8 @@ const PaymentPage = () => {
   }, [])
 
   useEffect(() => {
-    if (paymentMethod === "VNPAY") {
-      handleVNPayPayment()
+    if (paymentMethod === "visa") {
+      window.location.href = "/checkout/payment/visa"
     }
   }, [paymentMethod])
 
