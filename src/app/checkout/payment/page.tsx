@@ -25,10 +25,10 @@ const PaymentPage = () => {
 
     if (method === "visa") {
       window.location.href = "/checkout/payment/visa"
-    } else if (method === "VNPAY") {
+    } else if (method === "VNPAY" && cartTotal > 0) {
       handleVNPayPayment()
     }
-  }, []) // Combine the logic into a single useEffect
+  }, [cartTotal]) // Combine the logic into a single useEffect
   
   const handleVNPayPayment = async () => {
     setLoading(true)
