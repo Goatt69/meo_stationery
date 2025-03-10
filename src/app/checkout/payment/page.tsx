@@ -22,14 +22,14 @@ const PaymentPage = () => {
     const params = new URLSearchParams(window.location.search)
     const method = params.get("method") || "visa"
     setPaymentMethod(method)
-  }, [])
 
-  useEffect(() => {
-    if (paymentMethod === "visa") {
+    if (method === "visa") {
       window.location.href = "/checkout/payment/visa"
+    } else if (method === "VNPAY") {
+      handleVNPayPayment()
     }
-  }, [paymentMethod])
-
+  }, []) // Combine the logic into a single useEffect
+  
   const handleVNPayPayment = async () => {
     setLoading(true)
     const orderId = `ORDER_${Date.now()}`
