@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {useRouter} from "next/navigation";
 import {formatToVND} from "@/lib/utils";
+import Image from 'next/image'
 
 type SearchProduct = {
   id: number
@@ -95,8 +96,14 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              StationeryShop
+            <Link href="/" className="flex items-center">
+              <Image
+                  src="/logo.jpg"
+                  alt="Meo Stationery Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+              />
             </Link>
           </div>
           <div className="flex items-center">

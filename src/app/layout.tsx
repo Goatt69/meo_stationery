@@ -5,12 +5,18 @@ import Footer from '../components/Footer'
 import { AdminRouteDetector } from '@/components/AdminRouteDetector'
 import React from "react";
 import {Toaster} from "sonner";
+import {Metadata} from "next";
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'Stationery E-commerce',
+export const metadata: Metadata = {
+  title: 'Meo Stationery',
   description: 'Your one-stop shop for all stationery needs',
+  keywords: ['stationery', 'văn phòng phẩm', 'dụng cụ học tập'],
+  openGraph: {
+    title: 'Meo Stationery',
+    description: 'Quality stationery products for everyone',
+  },
 }
 
 export default function RootLayout({
