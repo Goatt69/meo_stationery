@@ -100,9 +100,9 @@ export default function Navbar() {
               <Image
                   src="/logo.jpg"
                   alt="Meo Stationery Logo"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
+                  width={250}
+                  height={250}
+                  className="scale-125"
               />
             </Link>
           </div>
