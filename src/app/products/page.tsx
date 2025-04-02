@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/products/ProductGrid";
 import ProductsFilter from "@/components/products/ProductsFilter";
@@ -16,7 +16,7 @@ interface ProductsResponse {
   priceRange?: PriceRange;
 }
 
-export default function ProductsPage() {
+function Products() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,5 +93,22 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-10 px-4">
+        <h1 className="text-3xl font-bold mb-8">Tất cả sản phẩm</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-gray-100 rounded-lg h-80 animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    }>
+      <Products />
+    </Suspense>
   );
 }

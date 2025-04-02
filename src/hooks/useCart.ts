@@ -19,24 +19,30 @@ export function useCart() {
   }, [])
 
   const addItem = (item: CartItem) => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]')
-    const existingItem = cart.find((i: CartItem) => i.id === item.id)
-  
-    if (existingItem) {
-      existingItem.quantity += item.quantity
-    } else {
-      cart.push(item)
-    }
-  
-    localStorage.setItem('cart', JSON.stringify(cart))
+    setItems(currentItems => {
+      const existingItem = currentItems.find(i => i.id === item.id)
+      
+      const newItems = existingItem 
+        ? currentItems.map(i => 
+            i.id === item.id 
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
+          )
+        : [...currentItems, item]
+      
+      localStorage.setItem('cart', JSON.stringify(newItems))
+      return newItems
+    })
     triggerCartUpdate()
   }
+
   const removeItem = (id: string) => {
     setItems(currentItems => {
       const newItems = currentItems.filter(item => item.id !== id)
       localStorage.setItem('cart', JSON.stringify(newItems))
       return newItems
     })
+    triggerCartUpdate()
   }
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -61,4 +67,3 @@ export function useCart() {
 const triggerCartUpdate = () => {
   window.dispatchEvent(new Event('cartUpdated'))
 }
-

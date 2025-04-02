@@ -44,7 +44,8 @@ export default function AddToCartButton({
         id: product.id,
         name: product.name,
         price: product.price,
-        quantity: quantity
+        quantity: quantity,
+        stock: product.quantity
       });
       
       toast.success("Đã thêm vào giỏ hàng", {
@@ -56,53 +57,74 @@ export default function AddToCartButton({
     }, 500);
   };
 
-  return (
-    <div className={`flex ${showQuantity ? 'items-center gap-3' : ''} ${className}`}>
-      {showQuantity && (
-        <div className="flex items-center border border-gray-300 rounded-md">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-none"
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+  const incrementQuantity = () => {
+    if (quantity < product.quantity) {
+      setQuantity(q => q + 1);
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(q => q - 1);
+    }
+  };
+
+  if (showQuantity) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Button 
+            type="button" 
+            size="icon" 
+            variant="outline" 
+            onClick={decrementQuantity}
             disabled={quantity <= 1 || disabled}
           >
-            <Minus className="h-3 w-3" />
+            <Minus className="h-4 w-4" />
           </Button>
           <span className="w-8 text-center">{quantity}</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-none"
-            onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+          <Button 
+            type="button" 
+            size="icon" 
+            variant="outline" 
+            onClick={incrementQuantity}
             disabled={quantity >= product.quantity || disabled}
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
-      )}
-      
-      <Button
-        onClick={handleAddToCart}
-        variant={variant}
-        size={size}
-        disabled={disabled || isAdding || (existingItem && existingItem.quantity >= product.quantity)}
-        className={`${isAdding ? 'animate-pulse' : ''} ${className}`}
-      >
-        {isInCart ? (
-          <>
+        <Button 
+          onClick={handleAddToCart}
+          variant={variant}
+          size={size}
+          className={className}
+          disabled={disabled || isAdding || product.quantity === 0}
+        >
+          {isAdding ? (
             <Check className="mr-2 h-4 w-4" />
-            Đã thêm
-          </>
-        ) : (
-          <>
+          ) : (
             <ShoppingCart className="mr-2 h-4 w-4" />
-            Thêm vào giỏ
-          </>
-        )}
-      </Button>
-    </div>
+          )}
+          {isAdding ? "Đã thêm" : "Thêm vào giỏ hàng"}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button 
+      onClick={handleAddToCart}
+      variant={variant}
+      size={size}
+      className={className}
+      disabled={disabled || isAdding || product.quantity === 0}
+    >
+      {isAdding ? (
+        <Check className="mr-2 h-4 w-4" />
+      ) : (
+        <ShoppingCart className="mr-2 h-4 w-4" />
+      )}
+      {isAdding ? "Đã thêm" : "Thêm vào giỏ hàng"}
+    </Button>
   );
 }

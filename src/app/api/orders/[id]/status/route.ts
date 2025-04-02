@@ -1,10 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request, { params }) {
   try {
     const orderId = parseInt(params.id);
     if (isNaN(orderId)) {
@@ -53,27 +50,23 @@ export async function PUT(
           });
         });
 
-        return NextResponse.json({
-          message: "Order cancelled and product quantities restored",
-          order: { id: orderId, status }
+        return NextResponse.json({ 
+          message: "Order cancelled and product quantities returned to inventory" 
         });
       }
     }
 
-    // For non-cancellation updates or already cancelled orders
+    // For other status updates, just update the status
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status },
     });
 
-    return NextResponse.json({
-      message: "Order status updated successfully",
-      order: updatedOrder
-    });
+    return NextResponse.json(updatedOrder);
   } catch (error) {
     console.error("Error updating order status:", error);
     return NextResponse.json(
-      { message: "Failed to update order status", error: error instanceof Error ? error.message : "Unknown error" },
+      { message: "Error updating order status" },
       { status: 500 }
     );
   }

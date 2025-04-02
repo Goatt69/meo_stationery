@@ -39,37 +39,6 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[url('/stationery-pattern.png')] opacity-10 mix-blend-overlay"></div>
       </section>
 
-      {/* Featured Categories */}
-      <section className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6">Danh mục nổi bật</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: "Bút & Viết", image: "/categories/pens.jpg", fallback: "/placeholder.svg" },
-            { name: "Sổ & Giấy", image: "/categories/notebooks.jpg", fallback: "/placeholder.svg" },
-            { name: "Dụng cụ văn phòng", image: "/categories/office.jpg", fallback: "/placeholder.svg" },
-            { name: "Phụ kiện học tập", image: "/categories/accessories.jpg", fallback: "/placeholder.svg" }
-          ].map((category, index) => (
-            <div key={index} className="relative rounded-lg overflow-hidden group h-40 shadow-md">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
-              <Image 
-                src={category.image} 
-                alt={category.name}
-                width={300}
-                height={200}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                style={{ objectFit: 'cover' }}
-                // Using Next.js Image component with proper fallback
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAEtAJJXIDTjgAAAABJRU5ErkJggg=="
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                <h3 className="text-white font-medium">{category.name}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* New Arrivals */}
       <section className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
