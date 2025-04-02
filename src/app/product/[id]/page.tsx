@@ -7,7 +7,7 @@ import { formatToVND, getStockStatus } from "@/lib/utils";
 import { use, useState, useEffect, useRef } from "react";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner"
-import { ChevronLeft, ChevronRight, Minus, Plus, ShoppingCart, Star, Truck, Package, ArrowLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus, ShoppingCart, Truck, Package, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -139,10 +139,6 @@ const ProductPage = (props: { params: Promise<{ id: string }> }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/product">Sản phẩm</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
             <BreadcrumbPage>{product.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -210,16 +206,7 @@ const ProductPage = (props: { params: Promise<{ id: string }> }) => {
         <div className="flex flex-col">
           <div className="mb-auto">
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <span className="text-sm text-gray-500">(5.0)</span>
-            </div>
-            
+
             <div className="mb-6">
               <p className="text-3xl font-bold text-primary mb-1">
                 {formatToVND(product.price)}
