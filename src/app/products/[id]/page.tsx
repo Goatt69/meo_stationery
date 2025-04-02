@@ -63,7 +63,7 @@ const ProductPage = (props: { params: Promise<{ id: string }> }) => {
 
   useEffect(() => {
     const loadProductImages = async () => {
-      const images = []
+      const images: string[] = []
       for(let i = 0; i < 10; i++) {
         const imagePath = `/products/${params.id}/${i}.jpg`
         try {
