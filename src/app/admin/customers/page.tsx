@@ -136,7 +136,9 @@ export default function CustomersPage() {
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
-                                                            {customer.orders.map((order) => (
+                                                            {customer.orders
+                                                                .filter(order => order.status !== 'CANCELLED')
+                                                                .map((order) => (
                                                                 <TableRow key={order.id}>
                                                                     <TableCell>{order.id}</TableCell>
                                                                     <TableCell>{order.date}</TableCell>

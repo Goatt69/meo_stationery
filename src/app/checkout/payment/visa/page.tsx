@@ -64,12 +64,40 @@ const VISAPaymentPage = () => {
         });
 
         try {
+            // Get cart items and user details
+            const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+            const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+            
+            // Create order in database
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cartItems,
+                    userDetails,
+                    paymentDetails: {
+                        amount: cartTotal,
+                        method: 'VISA',
+                        status: 'COMPLETED',
+                    },
+                }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to create order');
+            }
+            
             await new Promise((resolve) => setTimeout(resolve, 2000));
+            
+            // Clear the cart after successful payment
+            localStorage.removeItem('cart');
+            
             toast.success("Thanh toán thành công", {
                 description: "Đơn hàng của bạn đã được xác nhận",
             });
             window.location.href = "/checkout/confirmation";
         } catch (error) {
+            console.error("Payment error:", error);
             toast.error("Lỗi thanh toán", {
                 description: "Vui lòng kiểm tra lại thông tin thẻ",
             });

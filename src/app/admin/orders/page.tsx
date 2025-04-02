@@ -6,9 +6,16 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {formatToVND} from "@/lib/utils";
-import {Dialog, DialogContent, DialogTitle, DialogHeader} from "@/components/ui/dialog";
+import { 
+    Select, 
+    SelectContent, 
+    SelectItem, 
+    SelectTrigger, 
+    SelectValue 
+} from "@/components/ui/select"
+import { formatToVND } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast"
+import { OrderDetailsDialog } from "@/components/OrderDetailsDialog"
 
 interface OrderItem {
     orderId: number
@@ -28,6 +35,15 @@ interface Order {
   user: {
     fullName: string
     email: string
+    address: {
+      id: number
+      street: string
+      ward: string | null
+      district: string | null
+      city: string | null
+      country: string | null
+      apartment: string | null
+    }
   }
   payment: {
     amount: number
@@ -41,13 +57,22 @@ export default function OrdersPage() {
     const [statusFilter, setStatusFilter] = useState("All")
     const [isLoading, setIsLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+    const [updatingStatus, setUpdatingStatus] = useState(false)
+    const [statusUpdateId, setStatusUpdateId] = useState<number | null>(null)
     
     useEffect(() => {
         const fetchOrders = async () => {
             try {
                 const response = await fetch('/api/orders')
                 const data = await response.json()
-                setOrders(data.orders)
+                console.log('Orders data:', data)
+                
+                // Make sure we're getting the orders with the correct structure
+                if (data.success && Array.isArray(data.orders)) {
+                    setOrders(data.orders)
+                } else {
+                    console.error('Unexpected API response format:', data)
+                }
             } catch (error) {
                 console.error('Failed to fetch orders:', error)
             } finally {
@@ -57,6 +82,70 @@ export default function OrdersPage() {
 
         fetchOrders()
     }, [])
+
+    const handleUpdateStatus = async (orderId: number, newStatus: string) => {
+        if (!orderId || !newStatus) return
+        
+        setUpdatingStatus(true)
+        try {
+            const response = await fetch(`/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            })
+            
+            if (response.ok) {
+                // Update local state
+                setOrders(prevOrders => 
+                    prevOrders.map(order => 
+                        order.id === orderId 
+                            ? { ...order, status: newStatus as 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' } 
+                            : order
+                    )
+                )
+                
+                // If we're cancelling and updating the selected order, update that too
+                if (selectedOrder && selectedOrder.id === orderId) {
+                    setSelectedOrder(prev => prev ? {...prev, status: newStatus as 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'} : null)
+                }
+                
+                // Show success toast
+                toast({
+                    title: "Status Updated",
+                    description: `Order #${orderId} status updated to ${newStatus}`,
+                    variant: "default",
+                })
+
+                // If cancelled, show special message about returned inventory
+                if (newStatus === 'CANCELLED') {
+                    toast({
+                        title: "Inventory Updated",
+                        description: "Product quantities have been returned to inventory",
+                        variant: "default",
+                    })
+                }
+            } else {
+                const errorData = await response.json()
+                toast({
+                    title: "Error",
+                    description: errorData.message || 'Failed to update order status',
+                    variant: "destructive",
+                })
+            }
+        } catch (error) {
+            console.error('Error updating order status:', error)
+            toast({
+                title: "Error",
+                description: 'An error occurred while updating the order status',
+                variant: "destructive",
+            })
+        } finally {
+            setUpdatingStatus(false)
+            setStatusUpdateId(null)
+        }
+    }
 
     const filteredOrders = orders.filter(
         (order) =>
@@ -87,7 +176,7 @@ export default function OrdersPage() {
             <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
     
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                     <Input
                         placeholder="Search orders..."
                         value={search}
@@ -114,110 +203,73 @@ export default function OrdersPage() {
                         <CardTitle>Order List</CardTitle>
                         <CardDescription>Manage and review all customer orders.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Order ID</TableHead>
-                                    <TableHead>Customer</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Total</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
+                    <CardContent className="px-0">
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center">Loading orders...</TableCell>
+                                        <TableHead>Order ID</TableHead>
+                                        <TableHead>Customer</TableHead>
+                                        <TableHead className="hidden md:table-cell">Email</TableHead>
+                                        <TableHead className="hidden md:table-cell">Date</TableHead>
+                                        <TableHead>Total</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ) : filteredOrders.map((order) => (
-                                    <TableRow key={order.id}>
-                                        <TableCell className="font-medium">{order.id}</TableCell>
-                                        <TableCell>{order.user.fullName}</TableCell>
-                                        <TableCell>{order.user.email}</TableCell>
-                                        <TableCell>
-                                            {new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric'
-                                            })}
-                                        </TableCell>
-                                        <TableCell>{formatToVND(order.payment[0]?.amount || 0)}</TableCell>
-                                        <TableCell>
-                                            <Badge className={`${getStatusColor(order.status)} text-white`}>
-                                                {order.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm" onClick={() => setSelectedOrder(order)}>
-                                                View Details
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {isLoading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="text-center">Loading orders...</TableCell>
+                                        </TableRow>
+                                    ) : filteredOrders.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="text-center">No orders found</TableCell>
+                                        </TableRow>
+                                    ) : filteredOrders.map((order) => (
+                                        <TableRow key={order.id}>
+                                            <TableCell className="font-medium">{order.id}</TableCell>
+                                            <TableCell>{order.user.fullName}</TableCell>
+                                            <TableCell className="hidden md:table-cell">{order.user.email}</TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                {new Date(order.createdAt).toLocaleDateString('en-GB', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric'
+                                                })}
+                                            </TableCell>
+                                            <TableCell>{formatToVND(order.payment[0]?.amount || 0)}</TableCell>
+                                            <TableCell>
+                                                <Badge className={`${getStatusColor(order.status)} text-white`}>
+                                                    {order.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col sm:flex-row gap-2">
+                                                    <Button 
+                                                        variant="outline" 
+                                                        size="sm" 
+                                                        onClick={() => setSelectedOrder(order)}
+                                                    >
+                                                        View Details
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
-                <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Order Details</DialogTitle>
-                        </DialogHeader>
-                        {selectedOrder && (
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className="text-sm font-medium">Order ID:</div>
-                                    <div className="text-sm">{selectedOrder.id}</div>
-
-                                    <div className="text-sm font-medium">Status:</div>
-                                    <div className="text-sm">
-                                        <Badge className={`${getStatusColor(selectedOrder.status)} text-white`}>
-                                            {selectedOrder.status}
-                                        </Badge>
-                                    </div>
-
-                                    <div className="text-sm font-medium">Date:</div>
-                                    <div className="text-sm">
-                                        {new Date(selectedOrder.createdAt).toLocaleDateString()}
-                                    </div>
-
-                                    <div className="text-sm font-medium">Customer:</div>
-                                    <div className="text-sm">{selectedOrder.user.fullName}</div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <h3 className="text-sm font-medium mb-2">Order Items:</h3>
-                                    <div className="space-y-2">
-                                        {selectedOrder.items?.map((item) => (
-                                            <div key={`${item.orderId}-${item.productId}`}
-                                                 className="flex justify-between items-center border-b pb-2">
-                                                <div>
-                                                    <div className="text-sm font-medium">{item.product.name}</div>
-                                                    <div className="text-sm text-muted-foreground">
-                                                        Quantity: {item.quantity}
-                                                    </div>
-                                                </div>
-                                                <div className="text-sm font-medium">
-                                                    {formatToVND(item.product.price * item.quantity)}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between items-center pt-4">
-                                    <div className="text-sm font-medium">Total Amount:</div>
-                                    <div className="text-lg font-bold">
-                                        {formatToVND(selectedOrder.payment[0]?.amount || 0)}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </DialogContent>
-                </Dialog>
+                
+                <OrderDetailsDialog
+                    order={selectedOrder}
+                    open={!!selectedOrder}
+                    onOpenChange={(open) => !open && setSelectedOrder(null)}
+                    onStatusUpdate={handleUpdateStatus}
+                    updatingStatus={updatingStatus}
+                />
             </div>
         </div>
     )

@@ -91,6 +91,7 @@ export async function GET() {
           select: {
             fullName: true,
             email: true,
+            address: true, // Include address information
           },
         },
         payment: {

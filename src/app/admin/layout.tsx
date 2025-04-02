@@ -62,8 +62,8 @@ export default function AdminLayout({
   return (
     <div className={inter.className}>
       <SidebarProvider>
-        <div className="flex h-screen w-full">
-          <Sidebar className="w-64 shrink-0">
+        <div className="flex flex-col md:flex-row h-screen w-full">
+          <Sidebar className="w-full md:w-64 md:shrink-0 h-auto md:h-full">
             <SidebarHeader>
               <Link href="/" className="flex items-center gap-2 font-semibold p-4">
                 <Package className="h-6 w-6" />
@@ -93,7 +93,7 @@ export default function AdminLayout({
               </SidebarGroup>
             </SidebarContent>
           </Sidebar>
-          <main className="flex-1 overflow-y-auto p-8 w-full">
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full">
             {children}
           </main>
         </div>
