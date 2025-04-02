@@ -42,7 +42,7 @@ export default function ConfirmationPage() {
                             Quay Về Trang Chủ
                         </Button>
                     </Link>
-                    <Link href="/" className="w-full sm:w-auto">
+                    <Link href="/products" className="w-full sm:w-auto">
                         <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600">
                             Tiếp Tục Mua Sắm
                             <ArrowRight className="ml-2 h-4 w-4" />

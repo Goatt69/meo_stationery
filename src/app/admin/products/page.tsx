@@ -43,7 +43,11 @@ export default function ProductsPage() {
   const fetchProducts = () => {
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data))
+      .then(data => {
+        // Handle both formats - array or object with products property
+        const productArray = Array.isArray(data) ? data : data.products || [];
+        setProducts(productArray);
+      })
   }
   
   useEffect(() => {

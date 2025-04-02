@@ -139,6 +139,10 @@ const ProductPage = (props: { params: Promise<{ id: string }> }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
+            <BreadcrumbLink href="/products">Sản phẩm</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbPage>{product.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
