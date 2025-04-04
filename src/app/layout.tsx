@@ -1,13 +1,11 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import { AdminRouteDetector } from '@/components/AdminRouteDetector'
+import { Quicksand } from 'next/font/google'
 import React from "react";
 import {Toaster} from "sonner";
 import {Metadata} from "next";
+import MainLayout from '../components/MainLayout';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Quicksand({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Meo Stationery',
@@ -27,16 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
-        <AdminRouteDetector>
-          <Navbar />
-        </AdminRouteDetector>
-        <main className="container mx-auto px-4 py-8 flex-grow">
+        <MainLayout>
           {children}
-        </main>
+        </MainLayout>
         <Toaster richColors position="bottom-right" />
-        <AdminRouteDetector>
-          <Footer />
-        </AdminRouteDetector>
       </body>
     </html>
   )

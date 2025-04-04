@@ -5,7 +5,7 @@ import { CalendarDateRangePicker } from '@/components/ui/date-range-picker'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Download, DollarSign, Users, ShoppingCart, Activity } from 'lucide-react'
+import { Download, DollarSign, Users, ShoppingCart, Activity, RefreshCw } from 'lucide-react'
 import {useEffect, useState} from "react";
 import {
   formatToVND,
@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState([])
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(new Date().setMonth(new Date().getMonth() - 1)),
     to: new Date()
@@ -68,27 +69,41 @@ export default function DashboardPage() {
   const recentSales = getRecentSales(filteredOrders)
   const comparisons = getMonthlyComparisons(filteredOrders)
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [ordersRes, customersRes] = await Promise.all([
-          fetch('/api/orders'),
-          fetch('/api/customers')
-        ])
+  const fetchDashboardData = async () => {
+    try {
+      setRefreshing(true)
+      
+      // Add cache-busting query parameter to prevent caching
+      const timestamp = new Date().getTime()
+      const [ordersRes, customersRes] = await Promise.all([
+        fetch(`/api/orders?t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`/api/customers?t=${timestamp}`, { cache: 'no-store' })
+      ])
 
-        const ordersData = await ordersRes.json()
-        const customersData = await customersRes.json()
+      const ordersData = await ordersRes.json()
+      const customersData = await customersRes.json()
 
-        setOrders(ordersData.orders || [])
-        setCustomers(customersData || [])
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error)
-      } finally {
-        setLoading(false)
-      }
+      setOrders(ordersData.orders || [])
+      setCustomers(customersData || [])
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
     }
+  }
 
+  // Initial data fetch
+  useEffect(() => {
     fetchDashboardData()
+    
+    // Set up polling every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchDashboardData()
+    }, 30000)
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId)
   }, [])
   
   return (
@@ -100,6 +115,18 @@ export default function DashboardPage() {
               value={dateRange}
               onDateChange={setDateRange}
           />
+          <Button 
+            size="sm" 
+            onClick={fetchDashboardData}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Refresh
+          </Button>
           <Button size="sm">
             <Download className="mr-2 h-4 w-4" />
             Download
@@ -210,4 +237,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

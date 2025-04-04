@@ -1,8 +1,15 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        // Get the URL to check for cache-busting parameters
+        const url = new URL(request.url);
+        
+        // Set cache control headers to prevent caching
+        const headers = new Headers();
+        headers.set('Cache-Control', 'no-store, max-age=0');
+        
         const customers = await prisma.user.findMany({
             include: {
                 orders: {
@@ -13,6 +20,9 @@ export async function GET() {
                             }
                         },
                         payment: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
                     }
                 }
             }
@@ -42,8 +52,12 @@ export async function GET() {
             }
         })
 
-        return NextResponse.json(formattedCustomers)
+        return NextResponse.json(formattedCustomers, { headers })
     } catch (error) {
-        return NextResponse.json({ error: "Failed to fetch customers" }, { status: 500 })
+        console.error('Failed to fetch customers:', error);
+        return NextResponse.json(
+            { error: "Failed to fetch customers" }, 
+            { status: 500 }
+        )
     }
 }

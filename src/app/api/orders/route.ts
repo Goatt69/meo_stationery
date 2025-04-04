@@ -1,10 +1,41 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+// Create a simple in-memory store to track recent order attempts
+// This helps prevent duplicate orders from the same user in quick succession
+const recentOrderAttempts = new Map<string, number>();
+const DEBOUNCE_TIME_MS = 5000; // 5 seconds debounce time
+
 export async function POST(request: Request) {
   const { cartItems, userDetails, paymentDetails } = await request.json();
 
   try {
+    // Create a unique key for this order attempt based on user email and cart contents
+    const orderKey = `${userDetails.email}-${JSON.stringify(cartItems)}`;
+    const now = Date.now();
+    
+    // Check if this is a duplicate order attempt within the debounce window
+    if (recentOrderAttempts.has(orderKey)) {
+      const lastAttempt = recentOrderAttempts.get(orderKey) || 0;
+      if (now - lastAttempt < DEBOUNCE_TIME_MS) {
+        console.log(`Duplicate order attempt detected for ${orderKey}, ignoring`);
+        return NextResponse.json({ 
+          success: false, 
+          error: "Please wait before submitting another order" 
+        }, { status: 429 });
+      }
+    }
+    
+    // Update the timestamp for this order attempt
+    recentOrderAttempts.set(orderKey, now);
+    
+    // Clean up old entries from the map to prevent memory leaks
+    for (const [key, timestamp] of recentOrderAttempts.entries()) {
+      if (now - timestamp > DEBOUNCE_TIME_MS * 2) {
+        recentOrderAttempts.delete(key);
+      }
+    }
+
     // First check if user exists
     let user = await prisma.user.findUnique({
       where: { email: userDetails.email }
@@ -83,7 +114,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const orders = await prisma.order.findMany({
       include: {

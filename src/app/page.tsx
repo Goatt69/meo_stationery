@@ -3,7 +3,6 @@ import ProductGrid from "@/components/products/ProductGrid";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 
 export default async function Home() {
   const products = await prisma.product.findMany({
