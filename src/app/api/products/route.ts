@@ -32,10 +32,21 @@ export async function GET(request: Request) {
 
   // Apply search filter
   if (search) {
-    where.name = {
-      contains: search,
-      mode: 'insensitive'
-    };
+    const decodedSearch = decodeURIComponent(search)
+    where.OR = [
+      {
+        name: {
+          contains: decodedSearch,
+          mode: 'insensitive'
+        }
+      },
+      {
+        description: {
+          contains: decodedSearch,
+          mode: 'insensitive'
+        }
+      }
+    ]
   }
 
   // Apply price filters

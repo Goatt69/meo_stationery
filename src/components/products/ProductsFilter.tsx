@@ -76,7 +76,9 @@ export default function ProductsFilter({
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    updateFilters({ search: search || null })
+    // Encode the search term properly
+    const encodedSearch = search ? encodeURIComponent(search.trim()) : null
+    updateFilters({ search: encodedSearch })
   }
   
   // Reset all filters
