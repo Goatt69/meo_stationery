@@ -6,7 +6,7 @@ export default function FAQPage() {
         {
             question: "What payment methods do you accept?",
             answer:
-                "We accept Visa, MasterCard, American Express, and PayPal. We also offer cash on delivery for certain locations.",
+                "We accept Visa, MasterCard, VNPay. We also offer cash on delivery for certain locations.",
         },
         {
             question: "How long does shipping take?",

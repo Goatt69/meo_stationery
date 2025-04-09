@@ -1,16 +1,24 @@
-import { prisma } from '@/lib/prisma'
+"use client"
+
 import ProductGrid from "@/components/products/ProductGrid";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import {useEffect, useState} from "react";
+import { Product } from '@prisma/client'
 
-export default async function Home() {
-  const products = await prisma.product.findMany({
-    orderBy: {
-      createdAt: 'desc'
-    },
-    take: 8 // Limit to 8 products for the main page
-  });
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    async function fetchProducts() {
+      const response = await fetch('/api/products?sort=newest&take=8')
+      const data = await response.json()
+      setProducts(data.products)
+    }
+
+    fetchProducts()
+  }, [])
   
   return (
     <div className="space-y-16">

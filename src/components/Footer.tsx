@@ -22,9 +22,9 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <p className="text-sm text-gray-600">
-              Email: info@stationeryshop.com<br />
-              Phone: (123) 456-7890<br />
-              Address: 123 Phạm Văn Chiêu, P.9 , Gò Vấp, Ho Chi Minh City, Vietnam
+              Email: 22dh121484@st.huflit.edu.vn<br />
+              Phone: (+84) 908 563 838<br />
+              Address: 806 QL22, ấp Mỹ Hoà 3, Hóc Môn, Hồ Chí Minh, Vietnam
             </p>
           </div>
         </div>

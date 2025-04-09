@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const sort = url.searchParams.get('sort');
   const minPrice = url.searchParams.get('minPrice');
   const maxPrice = url.searchParams.get('maxPrice');
-
+  const take = url.searchParams.get('take');
   // If an ID is provided, return a single product
   if (id) {
     const product = await prisma.product.findUnique({
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
       orderBy = { createdAt: 'desc' };
     }
   }
-
+  
   // Get price range for filters
   const priceStats = await prisma.$queryRaw<PriceStats[]>`
     SELECT MIN(price) as "min", MAX(price) as "max" FROM "Product"
@@ -64,7 +64,8 @@ export async function GET(request: Request) {
   // Fetch filtered products
   const products = await prisma.product.findMany({
     where,
-    orderBy
+    orderBy,
+    take: take ? parseInt(take) : undefined
   });
 
   return NextResponse.json({
@@ -91,13 +92,19 @@ export async function PUT(request: Request) {
   const id = url.searchParams.get('id');
   const data = await request.json();
 
+  const parsedData = {
+    ...data,
+    price: parseInt(data.price),
+    quantity: parseInt(data.quantity)
+  };
+  
   if (!id) {
     return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
   }
 
   const product = await prisma.product.update({
     where: { id },
-    data
+    data: parsedData
   });
 
   return NextResponse.json(product);

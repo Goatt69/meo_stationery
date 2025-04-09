@@ -100,6 +100,8 @@ export default function OrdersPage() {
         if (!orderId || !newStatus) return
         
         setUpdatingStatus(true)
+        setStatusUpdateId(orderId)
+        
         try {
             const response = await fetch(`/api/orders/${orderId}/status`, {
                 method: 'PUT',

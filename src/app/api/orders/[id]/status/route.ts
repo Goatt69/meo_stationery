@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 
-export async function PUT(request, { params }) {
+export async function PUT(
+    request: NextRequest
+) {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split('/');
+  const idFromPath = pathParts[pathParts.indexOf('orders') + 1];
   try {
-    const orderId = parseInt(params.id);
+    const orderId = parseInt(idFromPath);
     if (isNaN(orderId)) {
       return NextResponse.json({ message: "Invalid order ID" }, { status: 400 });
     }
