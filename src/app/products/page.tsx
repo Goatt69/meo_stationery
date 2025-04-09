@@ -21,7 +21,7 @@ function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000000);
+  const [maxPrice, setMaxPrice] = useState(100000);
   
   // Get filter values from URL
   const searchQuery = searchParams.get("search") || "";
@@ -36,6 +36,10 @@ function Products() {
       try {
         // Build query parameters
         const params = new URLSearchParams(searchParams.toString());
+        
+        if (!params.has('take')) {
+          params.set('take', '100'); // Or any sufficiently large number
+        }
         
         // Fetch products
         const response = await fetch(`/api/products?${params.toString()}`);
