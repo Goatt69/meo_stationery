@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-    provider = "postgresql" // or "mysql" or your preferred database
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
@@ -14,14 +14,9 @@ generator client {
 }
 
 enum Gender {
-    MALE
-    FEMALE
-}
-
-enum StockStatus {
-    OUT_OF_STOCK
-    IN_STOCK
-    RUNNING_LOW
+    Male
+    Female
+    Other
 }
 
 enum OrderStatus {
@@ -35,7 +30,7 @@ enum OrderStatus {
 model Order {
     id        Int         @id @default(autoincrement())
     user      User        @relation(fields: [userId], references: [id])
-    userId    Int         @unique
+    userId    Int
     status    OrderStatus @default(PENDING)
     createdAt String
     items     OrderItem[]
@@ -46,22 +41,19 @@ model OrderItem {
     order     Order   @relation(fields: [orderId], references: [id])
     orderId   Int
     product   Product @relation(fields: [productId], references: [id])
-    productId Int
+    productId String
     quantity  Int
 
-    @@id([orderId, productId]) // Composite primary key
+    @@id([orderId, productId])
 }
 
 model Product {
-    id          Int         @id @default(autoincrement())
+    id          String      @id
     name        String
     price       Int
     description String?
     createdAt   DateTime    @default(now())
-    category    Category?   @relation(fields: [categoryId], references: [id])
-    categoryId  Int?
     orderItems  OrderItem[]
-    stock       StockStatus @default(IN_STOCK)
     quantity    Int
 }
 
@@ -75,15 +67,6 @@ model User {
     address     Address  @relation(fields: [addressId], references: [id])
     addressId   Int
     orders      Order[]
-}
-
-model Category {
-    id       Int        @id @default(autoincrement())
-    catName  String
-    parent   Category?  @relation("ParentChild", fields: [parentId], references: [id])
-    parentId Int?
-    children Category[] @relation("ParentChild")
-    products Product[]
 }
 
 model Address {

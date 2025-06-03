@@ -10,7 +10,7 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="mb-4">
-                        Founded in 2023, StationeryShop has been passionate about providing high-quality stationery for all your
+                        Founded in 2025, StationeryShop has been passionate about providing high-quality stationery for all your
                         needs. Our journey began with a simple idea: to offer a curated selection of the finest writing instruments,
                         paper products, and office supplies to stationery enthusiasts and professionals alike.
                     </p>

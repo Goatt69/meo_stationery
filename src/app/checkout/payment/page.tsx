@@ -1,47 +1,44 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 const PaymentPage = () => {
-  const [paymentMethod, setPaymentMethod] = useState("visa");
-  const [loading, setLoading] = useState(false);
-  const [cartTotal, setCartTotal] = useState(0);
-  
+  const [paymentMethod, setPaymentMethod] = useState("visa")
+  const [loading, setLoading] = useState(false)
+  const [cartTotal, setCartTotal] = useState(0)
+
   useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
+    const storedCart = localStorage.getItem('cart')
     if (storedCart) {
-      const cartItems = JSON.parse(storedCart);
+      const cartItems = JSON.parse(storedCart)
       const total = cartItems.reduce((sum: number, item: any) =>
           sum + item.price * item.quantity, 0
-      );
-      setCartTotal(total);
+      )
+      setCartTotal(total)
     }
-  }, []);
+  }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const method = params.get("method") || "visa"
+    setPaymentMethod(method)
+
+    if (method === "visa") {
+      window.location.href = "/checkout/payment/visa"
+    } else if (method === "VNPAY" && cartTotal > 0) {
+      handleVNPayPayment()
+    }
+  }, [cartTotal]) // Combine the logic into a single useEffect
   
-  // Use `window.location.search` instead of `useSearchParams`
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const method = params.get("method") || "visa";
-    setPaymentMethod(method);
-  }, []);
-
-  useEffect(() => {
-    if (paymentMethod === "VNPAY") {
-      handleVNPayPayment();
-    }
-  }, [paymentMethod]);
-
   const handleVNPayPayment = async () => {
-    setLoading(true);
-    const orderId = `ORDER_${Date.now()}`;
-    const amount = cartTotal;
-    const orderInfo = "Payment for order";
-
+    setLoading(true)
+    const orderId = `ORDER_${Date.now()}`
+    const amount = cartTotal
+    const orderInfo = "Payment for order"
     try {
-      // First save the order to database
-      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-      const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-
+      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]')
+      const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}')
+      
       await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,31 +51,31 @@ const PaymentPage = () => {
             status: 'PENDING',
           },
         }),
-      });
-      // Then proceed with VNPay payment
+      })
+
       const response = await fetch("/api/vnpay/generate-payment-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId, amount, orderInfo }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Network response was not ok")
       }
 
-      const data = await response.json();
+      const data = await response.json()
       if (data.paymentUrl) {
-        console.log("Redirecting to payment URL:", data.paymentUrl);
-        window.location.href = data.paymentUrl;
+        console.log("Redirecting to payment URL:", data.paymentUrl)
+        window.location.href = data.paymentUrl
       } else {
-        console.error("Payment URL not received");
+        console.error("Payment URL not received")
       }
     } catch (error) {
-      console.error("Error initiating payment:", error);
+      console.error("Error initiating payment:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -91,7 +88,7 @@ const PaymentPage = () => {
         <p>Selected payment method: {paymentMethod}</p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default PaymentPage;
+export default PaymentPage

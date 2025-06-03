@@ -37,13 +37,13 @@ export default function ContactPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="mb-2">
-                            <strong>Address:</strong> 123 Stationery St, Paper City, 12345
+                            <strong>Address:</strong> 806 QL22, ấp Mỹ Hoà 3, Hóc Môn, Hồ Chí Minh, Vietnam
                         </p>
                         <p className="mb-2">
-                            <strong>Phone:</strong> (123) 456-7890
+                            <strong>Phone:</strong> (+84) 908 563 838
                         </p>
                         <p className="mb-2">
-                            <strong>Email:</strong> info@stationeryshop.com
+                            <strong>Email:</strong> 22dh121484@st.huflit.edu.vn
                         </p>
                         <p className="mb-4">
                             <strong>Business Hours:</strong> Monday - Friday, 9am - 5pm

@@ -10,28 +10,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import React from "react";
 
 type ProductDialogProps = {
   isEdit?: boolean
   formData: {
     name: string
     price: string
-    stock: string
-    categoryId: string
+    quantity: string
     description: string
   }
-  categories: { id: number; catName: string }[]
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-  onSelectChange: (value: string) => void
   onSubmit: () => void
 }
 
 export function ProductDialog({ 
   isEdit = false, 
-  formData, 
-  categories, 
-  onInputChange, 
-  onSelectChange, 
+  formData,
+  onInputChange,
   onSubmit 
 }: ProductDialogProps) {
   return (
@@ -65,30 +61,15 @@ export function ProductDialog({
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="stock" className="text-right">Stock</Label>
+          <Label htmlFor="quantity" className="text-right">Quantity</Label>
           <Input
-            id="stock"
-            name="stock"
-            type="number"
-            value={formData.stock}
-            onChange={onInputChange}
-            className="col-span-3"
+              id="quantity"
+              name="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={onInputChange}
+              className="col-span-3"
           />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="category" className="text-right">Category</Label>
-          <Select value={formData.categoryId} onValueChange={onSelectChange}>
-            <SelectTrigger className="col-span-3">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.catName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="description" className="text-right">Description</Label>

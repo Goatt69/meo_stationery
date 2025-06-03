@@ -1,16 +1,20 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import { AdminRouteDetector } from '@/components/AdminRouteDetector'
+import { Quicksand } from 'next/font/google'
 import React from "react";
 import {Toaster} from "sonner";
+import {Metadata} from "next";
+import MainLayout from '../components/MainLayout';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Quicksand({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'Stationery E-commerce',
+export const metadata: Metadata = {
+  title: 'Meo Stationery',
   description: 'Your one-stop shop for all stationery needs',
+  keywords: ['stationery', 'văn phòng phẩm', 'dụng cụ học tập'],
+  openGraph: {
+    title: 'Meo Stationery',
+    description: 'Quality stationery products for everyone',
+  },
 }
 
 export default function RootLayout({
@@ -20,17 +24,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AdminRouteDetector>
-          <Navbar />
-        </AdminRouteDetector>
-        <main className="container mx-auto px-4 py-8">
+      <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <MainLayout>
           {children}
-        </main>
+        </MainLayout>
         <Toaster richColors position="bottom-right" />
-        <AdminRouteDetector>
-          <Footer />
-        </AdminRouteDetector>
       </body>
     </html>
   )

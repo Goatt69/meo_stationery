@@ -20,17 +20,20 @@ export const formatToVND = (price: number) => {
 }
 
 export const calculateTotalRevenue = (orders: any[]) => {
-  return orders.reduce((sum, order) => 
-    sum + (order.payment?.[0]?.amount || 0), 0)
+  return orders
+    .filter(order => order.status !== 'CANCELLED')
+    .reduce((sum, order) => sum + (order.payment?.[0]?.amount || 0), 0)
 }
 
 export const generateChartData = (orders: any[]) => {
-  const chartData = orders.reduce((acc, order) => {
-    const month = new Date(order.createdAt).toLocaleString('default', { month: 'short' })
-    const amount = order.payment[0]?.amount || 0
-    acc[month] = (acc[month] || 0) + amount
-    return acc
-  }, {})
+  const chartData = orders
+    .filter(order => order.status !== 'CANCELLED')
+    .reduce((acc, order) => {
+      const month = new Date(order.createdAt).toLocaleString('default', { month: 'short' })
+      const amount = order.payment[0]?.amount || 0
+      acc[month] = (acc[month] || 0) + amount
+      return acc
+    }, {})
 
   return Object.entries(chartData).map(([name, total]) => ({
     name,
@@ -40,11 +43,14 @@ export const generateChartData = (orders: any[]) => {
 
 export const getRecentSales = (orders: any[]) => {
   return orders
+      .filter(order => order.status !== 'CANCELLED')
       .slice(0, 5)
       .map(order => ({
+        id: order.id,
         name: order.user.fullName,
         email: order.user.email,
         amount: formatToVND(order.payment[0]?.amount || 0),
+
       }))
 }
 
@@ -62,12 +68,16 @@ export const getMonthlyComparisons = (orders: any[]) => {
 
   const currentMonthOrders = orders.filter(order => {
     const date = new Date(order.createdAt)
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear
+    return date.getMonth() === currentMonth && 
+           date.getFullYear() === currentYear && 
+           order.status !== 'CANCELLED'
   })
 
   const previousMonthOrders = orders.filter(order => {
     const date = new Date(order.createdAt)
-    return date.getMonth() === previousMonth && date.getFullYear() === previousYear
+    return date.getMonth() === previousMonth && 
+           date.getFullYear() === previousYear && 
+           order.status !== 'CANCELLED'
   })
 
   return {
@@ -91,4 +101,3 @@ export const getMonthlyComparisons = (orders: any[]) => {
     },
   }
 }
-

@@ -5,25 +5,9 @@ import Link from 'next/link'
 import { ShoppingCart, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
 import {useRouter} from "next/navigation";
 import {formatToVND} from "@/lib/utils";
-
-type Category = {
-  id: number
-  catName: string
-  children: {
-    id: number
-    catName: string
-  }[]
-}
+import Image from 'next/image'
 
 type SearchProduct = {
   id: number
@@ -34,7 +18,6 @@ type SearchProduct = {
 
 export default function Navbar() {
   const [cartItemCount, setCartItemCount] = useState(0)
-  const [categories, setCategories] = useState<Category[]>([])
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
@@ -106,59 +89,29 @@ export default function Navbar() {
       window.removeEventListener('storage', updateCartCount)
     }
   }, [])
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const response = await fetch('/api/categories')
-      const data = await response.json()
-      setCategories(data)
-    }
-    fetchCategories()
-  }, [])
+  
 
   return (
     <nav className="bg-white shadow-md fixed top-0 w-full z-50 ">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              StationeryShop
+            <Link href="/" className="flex items-center">
+              <Image
+                  src="/logo.jpg"
+                  alt="Meo Stationery Logo"
+                  width={250}
+                  height={250}
+                  className="scale-125"
+              />
             </Link>
-            <NavigationMenu className="ml-4">
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      {categories.map((category) => (
-                        <li key={category.id} className="row-span-3">
-                          <NavigationMenuLink asChild>
-                            <Link
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                              href={`/category/${category.catName.toLowerCase()}`}
-                            >
-                              <div className="mb-2 mt-4 text-lg font-medium">
-                                {category.catName}
-                              </div>
-                              <p className="text-sm leading-tight text-muted-foreground">
-                                {category.children.map(sub => sub.catName).join(', ')}
-                              </p>
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
           </div>
           <div className="flex items-center">
             <div className="relative mr-4" ref={searchRef}>
               <div className="relative">
                 <Input
                     type="search"
-                    placeholder="Search products..."
+                    placeholder="Tìm sản phẩm..."
                     className="pl-10 pr-4 py-2 rounded-full w-[300px]"
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
@@ -178,7 +131,7 @@ export default function Navbar() {
                           >
                             <div className="flex items-center space-x-4">
                               <img
-                                  src={"/placeholder.svg"}
+                                  src={`/products/${product.id}/0.jpg`}
                                   alt={product.name}
                                   className="w-12 h-12 object-cover rounded-md"
                               />
